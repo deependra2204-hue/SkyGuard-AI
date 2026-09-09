@@ -24,7 +24,10 @@ export default function Header({
   setHighContrast,
   reduceMotion,
   setReduceMotion,
-  now
+  now,
+  isOnline,
+  setLanguage,
+  language
 }) {
   return (
     <header style={{ background: T.navy, color: T.white, borderBottom: `3px solid ${T.saffron}` }}>
@@ -86,9 +89,40 @@ export default function Header({
             <div style={{ color: "rgba(255,255,255,0.65)" }}>Last Updated</div>
             <div style={{ fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>{now} IST</div>
           </div>
-          <button style={navBtnStyle} aria-label="Switch language">
-            <Globe size={15} /> EN | हिन्दी
-          </button>
+
+<div
+  style={{
+    display: "flex",
+    alignItems: "center",
+    gap: 6,
+    padding: "5px 9px",
+    borderRadius: 6,
+    background: isOnline ? "rgba(38,112,59,0.18)" : "rgba(178,51,39,0.18)",
+    color: isOnline ? "#9BE3AD" : "#FFB3AA",
+    fontSize: 12,
+    fontWeight: 600,
+  }}
+>
+  <span
+    style={{
+      width: 7,
+      height: 7,
+      borderRadius: "50%",
+      background: isOnline ? "#5BD477" : "#FF6B5E",
+    }}
+  />
+  {language === "hi"
+  ? (isOnline ? "ऑनलाइन" : "ऑफलाइन")
+  : (isOnline ? "Online" : "Offline")}
+</div>
+
+         <button
+            style={navBtnStyle}
+            aria-label="Switch language"
+            onClick={() => setLanguage?.(prev => prev === "en" ? "hi" : "en")}
+        >
+  <Globe size={15} /> EN | हिन्दी
+</button>
 
           <div className="flex items-center" style={{ gap: 4 }} role="group" aria-label="Text size">
             {["A-", "A", "A+"].map((label, i) => {

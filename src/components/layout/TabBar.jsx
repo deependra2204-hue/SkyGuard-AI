@@ -1,7 +1,7 @@
 import React from "react";
 import { T, TABS } from "../../constants/theme";
 
-export default function TabBar({ active, setActive, alertCount }) {
+export default function TabBar({ active, setActive, alertCount, language }) {
   return (
     <nav style={{ background: T.blue, borderBottom: `1px solid ${T.navy}` }} aria-label="Primary">
       <div className="flex" style={{ padding: "0 24px", overflowX: "auto" }}>
@@ -28,9 +28,20 @@ export default function TabBar({ active, setActive, alertCount }) {
                 borderTop: "none",
                 borderLeft: "none",
                 borderRight: "none",
+                
               }}
             >
-              <Icon size={15} /> {tab.label}
+              <Icon size={15} /> 
+              {language === "hi"
+  ? {
+      dashboard: "निगरानी डैशबोर्ड",
+      alerts: "अलर्ट केंद्र",
+      table: "स्टेशन रजिस्ट्री",
+      quality: "डेटा गुणवत्ता",
+      performance: "मॉडल प्रदर्शन",
+    }[tab.id] || tab.label
+  : tab.label}
+  
               {tab.id === "alerts" && alertCount > 0 && (
                 <span
                   style={{

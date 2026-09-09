@@ -19,6 +19,47 @@ import ModelPerformanceTab from "./components/tabs/ModelPerformanceTab";
 import { useStations, rand, pick } from "./utils/mockData";
 import { T, ANOMALY_TYPES } from "./constants/theme";
 
+const TRANSLATIONS = {
+  en: {
+    monitoringDashboard: "Monitoring Dashboard",
+    alertCenter: "Alert Center",
+    stationRegistry: "Station Registry",
+    dataQuality: "Data Quality",
+    modelPerformance: "Model Performance",
+    online: "Online",
+    offline: "Offline",
+    healthy: "Healthy",
+    warning: "Warning",
+    anomaly: "Anomaly",
+    station: "Station",
+    temperature: "Temperature",
+    humidity: "Humidity",
+    pressure: "Pressure",
+    wind: "Wind Speed",
+  },
+
+  hi: {
+    monitoringDashboard: "निगरानी डैशबोर्ड",
+    alertCenter: "अलर्ट केंद्र",
+    stationRegistry: "स्टेशन रजिस्ट्री",
+    dataQuality: "डेटा गुणवत्ता",
+    modelPerformance: "मॉडल प्रदर्शन",
+    online: "ऑनलाइन",
+    offline: "ऑफलाइन",
+    healthy: "स्वस्थ",
+    warning: "चेतावनी",
+    anomaly: "असामान्यता",
+    station: "स्टेशन",
+    temperature: "तापमान",
+    humidity: "आर्द्रता",
+    pressure: "वायुदाब",
+    wind: "हवा की गति",
+  },
+};
+
+const t = (language, key) =>
+  TRANSLATIONS[language]?.[key] || TRANSLATIONS.en[key] || key;
+
 export default function SkyGuardAI() {
   const stationsInit = useStations();
   const [stations, setStations] = useState(stationsInit);
@@ -35,7 +76,37 @@ export default function SkyGuardAI() {
   const [fontScale, setFontScale] = useState(1);
   const [highContrast, setHighContrast] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
+
+  const [language, setLanguage] = useState(
+  () => localStorage.getItem("skyguard-language") || "en"
+);
+
+useEffect(() => {
+  localStorage.setItem("skyguard-language", language);
+}, [language]);
+
+useEffect(() => {
+  document.documentElement.lang = language === "hi" ? "hi" : "en";
+}, [language]);
+
   const [now, setNow] = useState(() => new Date().toLocaleTimeString("en-IN", { hour12: false }));
+
+  const [isOnline, setIsOnline] = useState(
+  () => typeof navigator !== "undefined" ? navigator.onLine : true
+);
+
+useEffect(() => {
+  const handleOnline = () => setIsOnline(true);
+  const handleOffline = () => setIsOnline(false);
+
+  window.addEventListener("online", handleOnline);
+  window.addEventListener("offline", handleOffline);
+
+  return () => {
+    window.removeEventListener("online", handleOnline);
+    window.removeEventListener("offline", handleOffline);
+  };
+}, []);
 
   useEffect(() => {
     const t = setInterval(() => setNow(new Date().toLocaleTimeString("en-IN", { hour12: false })), 1000);
@@ -149,7 +220,10 @@ export default function SkyGuardAI() {
   return (
     <div
       style={{
-        fontFamily: "Inter, 'Segoe UI', system-ui, sans-serif",
+       fontFamily:
+        language === "hi"
+        ? "'Noto Sans Devanagari', 'Noto Sans', sans-serif"
+        : "Inter, 'Segoe UI', system-ui, sans-serif",
         background: T.offwhite,
         minHeight: "100%",
         fontSize: `${14 * fontScale}px`,
@@ -179,9 +253,16 @@ export default function SkyGuardAI() {
         reduceMotion={reduceMotion}
         setReduceMotion={setReduceMotion}
         now={now}
+        isOnline={isOnline}
+        setLanguage={setLanguage}
+        language={language}
       />
       <InfoBar stats={stats} reduceMotion={reduceMotion} lastSync={now} />
-      <TabBar active={activeTab} setActive={setActiveTab} alertCount={alertCount} />
+      <TabBar active={activeTab} 
+      setActive={setActiveTab}
+       alertCount={alertCount}
+       language={language}
+        />
 
       <main id="main-content" style={{ minHeight: 600 }}>
         {activeTab === "dashboard" && (
